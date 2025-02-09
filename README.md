@@ -2,10 +2,6 @@
 
 CObfuscator is a powerful Python package that transforms readable C code into functionally equivalent but harder-to-understand code. Perfect for protecting intellectual property, making reverse engineering more challenging, or learning about code transformation techniques.
 
-![PyPI version](https://img.shields.io/pypi/v/cobfuscator)
-![Python versions](https://img.shields.io/pypi/pyversions/cobfuscator)
-![License](https://img.shields.io/pypi/l/cobfuscator)
-
 ## Overview
 
 CObfuscator takes your C source code and applies various transformations to make it more difficult to understand while preserving its original functionality. It's like having a translator that converts your clear, readable code into a mysterious yet functionally identical version.

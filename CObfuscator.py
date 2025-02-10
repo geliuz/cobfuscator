@@ -78,6 +78,100 @@ class CObfuscator:
         result = self.add_junk_macros(result)
         result = self.split_lines(result)
         return result
+    
+    import re
+
+    def format_c_code(self, code):
+        """Format C code with proper indentation and spacing."""
+        # First, separate includes, macros, and code
+        lines = code.split('\n')
+        includes = []
+        macros = []
+        code_lines = []
+
+        # Split combined includes and defines into separate lines
+        for line in lines:
+            parts = line.strip().split(' #')  # Split on macro/include boundaries
+            for part in parts:
+                if part:
+                    if part.startswith('include'):
+                        # Remove spaces between <>, remove leading spaces, and add carriage return after >
+                        fixed_include = re.sub(r'\s*#?\s*include\s*<\s*([a-zA-Z0-9.]+)\s*>', r'#include<\1>\n', part)
+                        includes.append(fixed_include.strip())
+                    elif part.startswith('define'):
+                        macros.append(f'#{part.strip()}')
+                    else:
+                        code_lines.append(part)
+
+        # Format the main code
+        indent_level = 0
+        formatted_code = []
+
+        for line in code_lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+
+            # Decrease indent for closing braces
+            if stripped.startswith('}'):
+                indent_level = max(0, indent_level - 1)
+
+            # Add proper indentation
+            formatted_code.append('    ' * indent_level + stripped)
+
+            # Increase indent for opening braces
+            if stripped.endswith('{'):
+                indent_level += 1
+
+            # Handle single-line if/else cases
+            if stripped.endswith('}') and not stripped.startswith('}'):
+                indent_level = max(0, indent_level - 1)
+
+        # Combine all parts
+        result = []
+
+        # Add includes at the top, each on its own line
+        if includes:
+            result.extend(includes)
+
+        # Add macros, each on its own line
+        if macros:
+            result.extend(macros)
+            result.append('')  # Empty line after macros
+
+        # Add formatted code
+        result.extend(formatted_code)
+
+        # Join everything and format operators
+        final_code = '\n'.join(result)
+
+        # Add space after commas
+        final_code = re.sub(r',(?=\S)', ', ', final_code)
+
+        # Add space around operators
+        final_code = re.sub(r'\s*([=+\-*/<>])\s*', r' \1 ', final_code)
+
+        # Fix includes to ensure no spaces between < and >, remove leading spaces, and add carriage return after >
+        final_code = re.sub(r'#include\s*<\s*([^>\s]+)\s*>', r'#include<\1>\n', final_code)
+
+        # Remove whitespace at the beginning of lines that start with #
+        final_code = re.sub(r'^\s*(#)', r'\1', final_code, flags=re.MULTILINE)
+
+        return final_code
+
+
+
+        
+    def obfuscate(self, code):
+        """Apply all obfuscation techniques to the input code."""
+        result = code
+        result = self.obfuscate_variables(result)
+        result = self.obfuscate_functions(result)
+        result = self.add_junk_macros(result)
+        result = self.split_lines(result)
+        # Format the final code
+        result = self.format_c_code(result)
+        return result
 
 def main():
     # Example C code
@@ -91,14 +185,14 @@ def main():
     }
     
     int main() {
-        int x = 5;
-        int y = 10;
+        int x = 6;
+        int y = 11;
         int sum = add(x, y);
         printf("%d", sum);
         return 0;
     }
     """
-    
+
     # Create an instance of the obfuscator
     obfuscator = CObfuscator()
     

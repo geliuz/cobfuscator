@@ -18,7 +18,6 @@ Key Features:
 ### Basic Usage
 
 ```python
-from cobfuscator import CObfuscator
 
 # Create an obfuscator instance
 obfuscator = CObfuscator()

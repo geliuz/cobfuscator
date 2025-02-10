@@ -20,11 +20,9 @@ class CObfuscator:
         
         for match in declarations:
             var_name = match.group(1)
-            # Skip the word 'main' in any context
             if var_name != 'main' and var_name not in self.variable_map:
                 self.variable_map[var_name] = self.generate_random_name()
                 
-        # Replace all variable occurrences
         for original, obfuscated in self.variable_map.items():
             code = re.sub(r'\b' + original + r'\b', obfuscated, code)
             
@@ -37,11 +35,9 @@ class CObfuscator:
         
         for match in functions:
             func_name = match.group(1)
-            # Skip the word 'main' in any context
             if func_name != 'main' and func_name not in self.function_map:
                 self.function_map[func_name] = self.generate_random_name()
                 
-        # Replace function names
         for original, obfuscated in self.function_map.items():
             code = re.sub(r'\b' + original + r'\b', obfuscated, code)
             
@@ -79,19 +75,15 @@ class CObfuscator:
         result = self.split_lines(result)
         return result
     
-    import re
-
     def format_c_code(self, code):
         """Format C code with proper indentation and spacing."""
-        # First, separate includes, macros, and code
         lines = code.split('\n')
         includes = []
         macros = []
         code_lines = []
 
-        # Split combined includes and defines into separate lines
         for line in lines:
-            parts = line.strip().split(' #')  # Split on macro/include boundaries
+            parts = line.strip().split(' #')
             for part in parts:
                 if part:
                     if part.startswith('include'):
@@ -103,7 +95,6 @@ class CObfuscator:
                     else:
                         code_lines.append(part)
 
-        # Format the main code
         indent_level = 0
         formatted_code = []
 
@@ -112,49 +103,31 @@ class CObfuscator:
             if not stripped:
                 continue
 
-            # Decrease indent for closing braces
             if stripped.startswith('}'):
                 indent_level = max(0, indent_level - 1)
 
-            # Add proper indentation
             formatted_code.append('    ' * indent_level + stripped)
 
-            # Increase indent for opening braces
             if stripped.endswith('{'):
                 indent_level += 1
 
-            # Handle single-line if/else cases
             if stripped.endswith('}') and not stripped.startswith('}'):
                 indent_level = max(0, indent_level - 1)
 
-        # Combine all parts
         result = []
 
-        # Add includes at the top, each on its own line
         if includes:
             result.extend(includes)
 
-        # Add macros, each on its own line
         if macros:
             result.extend(macros)
             result.append('')  # Empty line after macros
 
-        # Add formatted code
         result.extend(formatted_code)
-
-        # Join everything and format operators
         final_code = '\n'.join(result)
-
-        # Add space after commas
         final_code = re.sub(r',(?=\S)', ', ', final_code)
-
-        # Add space around operators
         final_code = re.sub(r'\s*([=+\-*/<>])\s*', r' \1 ', final_code)
-
-        # Fix includes to ensure no spaces between < and >, remove leading spaces, and add carriage return after >
         final_code = re.sub(r'#include\s*<\s*([^>\s]+)\s*>', r'#include<\1>\n', final_code)
-
-        # Remove whitespace at the beginning of lines that start with #
         final_code = re.sub(r'^\s*(#)', r'\1', final_code, flags=re.MULTILINE)
 
         return final_code

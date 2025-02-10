@@ -52,6 +52,46 @@ class CObfuscator:
         ]
         return '\n'.join(junk_macros) + '\n\n' + code
     
+    def add_junk_functions(self, code):
+        """Add meaningless function declarations and calls to obscure the code."""
+        # Generate some random junk functions
+        junk_functions = []
+        
+        # Simple void functions with basic operations
+        basic_operations = [
+            "int {var1} = 0; {var1} += 1;",
+            "{var1} = {var1} & 0xFF;",
+            "int {var1} = 1; {var1} = {var1} << 2;",
+            "int {var1} = 100; {var1} = {var1} >> 1;",
+            "int {var1} = 1; {var1} = ~{var1};",
+            "int {var1} = 42; {var1} = {var1} | 0x0F;",
+        ]
+        
+        # Generate 3-5 random functions
+        num_functions = random.randint(3, 5)
+        for _ in range(num_functions):
+            # Generate random variable names
+            var1 = self.generate_random_name()
+            var2 = self.generate_random_name()
+            
+            # Pick a random operation
+            operation = random.choice(basic_operations).format(var1=var1, var2=var2)
+            
+            # Create function with random name
+            func_name = self.generate_random_name()
+            junk_function = f"""
+    void {func_name}() {{
+        if(1) {{
+            {operation}
+        }}
+    }}
+    """
+            junk_functions.append(junk_function)
+
+        # Add all junk functions at the beginning of the code
+        return '\n'.join(junk_functions) + '\n' + code
+
+
     def split_lines(self, code):
         """Randomly split lines to make code harder to read."""
         lines = code.split('\n')
@@ -72,9 +112,11 @@ class CObfuscator:
         result = self.obfuscate_variables(result)
         result = self.obfuscate_functions(result)
         result = self.add_junk_macros(result)
+        result = self.add_junk_functions(result)
         result = self.split_lines(result)
+        result = self.format_c_code(result)
         return result
-    
+        
     def format_c_code(self, code):
         """Format C code with proper indentation and spacing."""
         lines = code.split('\n')
@@ -145,3 +187,38 @@ class CObfuscator:
         # Format the final code
         result = self.format_c_code(result)
         return result
+
+def main():
+    # Example C code
+    c_code = """
+    #include <stdio.h>
+    #include <stdlib.h>
+    
+    int add(int a, int b) {
+        int result = a + b;
+        return result;
+    }
+    
+    int main() {
+        int x = 6;
+        int y = 11;
+        int sum = add(x, y);
+        printf("Hello World %d", sum);
+        return 0;
+    }
+    """
+
+    # Create an instance of the obfuscator
+    obfuscator = CObfuscator()
+    
+    # Obfuscate the code
+    obfuscated_code = obfuscator.obfuscate(c_code)
+    
+    # Print results
+    print("Original code:")
+    print(c_code)
+    print("\nObfuscated code:")
+    print(obfuscated_code)
+
+if __name__ == "__main__":
+    main()

@@ -27,13 +27,38 @@ from cobfuscator import CObfuscator
 obfuscator = CObfuscator()
 
 # Your original C code
-c_code = """
-int add(int a, int b) {
-    int result = a + b;
-    return result;
-}
-"""
+def main():
+    # Example C code
+    c_code = """
+    #include <stdio.h>
+    #include <stdlib.h>
+    
+    int add(int a, int b) {
+        int result = a + b;
+        return result;
+    }
+    
+    int main() {
+        int x = 6;
+        int y = 11;
+        int sum = add(x, y);
+        printf("Hello World %d", sum);
+        return 0;
+    }
+    """
 
-# Obfuscate the code
-obfuscated_code = obfuscator.obfuscate(c_code)
+    # Create an instance of the obfuscator
+    obfuscator = CObfuscator()
+    
+    # Obfuscate the code
+    obfuscated_code = obfuscator.obfuscate(c_code)
+    
+    # Print results
+    print("Original code:")
+    print(c_code)
+    print("\nObfuscated code:")
+    print(obfuscated_code)
+
+if __name__ == "__main__":
+    main()
 ```

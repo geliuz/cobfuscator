@@ -15,9 +15,6 @@ Key Features:
 
 ### Installation & Use
 
-```bash
-pip install cobfuscator
-
 ### Basic Usage
 
 ```python

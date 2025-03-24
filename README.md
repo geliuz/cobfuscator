@@ -1,3 +1,5 @@
+https://infosecwriteups.com/creating-a-code-obfuscation-program-for-c-d10d604178d4
+
 # CObfuscator
 
 CObfuscator is a powerful Python package that transforms readable C code into functionally equivalent but harder-to-understand code. Perfect for protecting intellectual property, making reverse engineering more challenging, or learning about code transformation techniques.
